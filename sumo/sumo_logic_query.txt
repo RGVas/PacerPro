@@ -1,0 +1,8 @@
+_sourceCategory=aws/lambda
+| json "path", "response_time_ms", "ec2_instance_id" as path, response_time_ms, ec2_instance_id
+| where path="/api/data"
+| where toLong(response_time_ms) > 3000
+| timeslice 10m
+| count as num_of_slow_requests by ec2_instance_id, _timeslice
+| where num_of_slow_requests > 5
+| sort by num_of_slow_requests desc
